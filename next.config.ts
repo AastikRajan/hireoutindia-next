@@ -1,11 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "export", // Enable static export
   eslint: {
-    // WARNING: This allows production builds to succeed even if there are ESLint errors.
     ignoreDuringBuilds: true,
   },
-  // Add other Next.js configuration options as needed
 };
 
 export default nextConfig;
