@@ -1,71 +1,48 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 // Use modern, abstract shape types
 const shapeTypes = ["blob", "hexagon", "spiral", "cog", "star"];
 
-interface ShapeItem {
-  key: number;
-  type: string;
-  top: number;
-  left: number;
-  delay: number;
-  size: number;
-  rotation: number;
-  zIndex: number;
-}
-
 const FloatingShapes = () => {
-  // State to hold the generated shape data
-  const [shapes, setShapes] = useState<ShapeItem[]>([]);
-
-  useEffect(() => {
-    const count = 6;
-    const generated: ShapeItem[] = Array.from({ length: count }).map(
-      (_, index) => {
-        const type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
-        return {
-          key: index,
-          type,
-          top: Math.random() * 100, // in vh
-          left: Math.random() * 100, // in vw
-          delay: Math.random() * 3, // in seconds
-          size: 20 + Math.random() * 30, // between 20px and 50px
-          rotation: Math.random() * 360, // degrees
-          zIndex: [-3, -2, -1][Math.floor(Math.random() * 3)],
-        };
-      }
-    );
-    setShapes(generated);
-  }, []);
-
-  // Until shapes are generated, render an empty container
-  if (shapes.length === 0) {
-    return <div className="floating-container" />;
-  }
+  // Generate 6 floating elements
+  const count = 6;
+  const items = Array.from({ length: count }).map((_, index) => {
+    const type = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+    return { type, key: index };
+  });
 
   return (
     <div className="floating-container">
-      {shapes.map((shape) => {
+      {items.map(({ type, key }) => {
+        // Randomize position, delay, size, rotation, and z-index
+        const top = Math.random() * 100;
+        const left = Math.random() * 100;
+        const delay = Math.random() * 3;
+        const size = 20 + Math.random() * 30; // between 20px and 50px
+        const randomRotation = Math.random() * 360;
+        const zIndexOptions = [-3, -2, -1];
+        const zIndex =
+          zIndexOptions[Math.floor(Math.random() * zIndexOptions.length)];
         const outerStyle: React.CSSProperties = {
-          top: `${shape.top}vh`,
-          left: `${shape.left}vw`,
-          width: `${shape.size}px`,
-          height: `${shape.size}px`,
-          zIndex: shape.zIndex,
+          top: `${top}vh`,
+          left: `${left}vw`,
+          width: `${size}px`,
+          height: `${size}px`,
+          zIndex,
           position: "absolute",
-          transform: `rotate(${shape.rotation}deg)`,
+          transform: `rotate(${randomRotation}deg)`,
         };
 
-        const innerStyle: React.CSSProperties = {
-          animationDelay: `${shape.delay}s`,
+        const innerDelayStyle: React.CSSProperties = {
+          animationDelay: `${delay}s`,
         };
 
-        let svgContent;
-        switch (shape.type) {
+        let content;
+        switch (type) {
           case "blob":
-            svgContent = (
+            content = (
               <svg
                 className="floating-shape blob"
                 viewBox="0 0 100 100"
@@ -76,7 +53,7 @@ const FloatingShapes = () => {
             );
             break;
           case "hexagon":
-            svgContent = (
+            content = (
               <svg
                 className="floating-shape hexagon"
                 viewBox="0 0 100 100"
@@ -87,7 +64,7 @@ const FloatingShapes = () => {
             );
             break;
           case "spiral":
-            svgContent = (
+            content = (
               <svg
                 className="floating-shape spiral"
                 viewBox="0 0 100 100"
@@ -100,7 +77,7 @@ const FloatingShapes = () => {
             );
             break;
           case "cog":
-            svgContent = (
+            content = (
               <svg
                 className="floating-shape cog"
                 viewBox="0 0 512 512"
@@ -111,8 +88,18 @@ const FloatingShapes = () => {
             );
             break;
           case "star":
+            content = (
+              <svg
+                className="floating-shape star"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+              </svg>
+            );
+            break;
           default:
-            svgContent = (
+            content = (
               <svg
                 className="floating-shape star"
                 viewBox="0 0 24 24"
@@ -124,9 +111,9 @@ const FloatingShapes = () => {
         }
 
         return (
-          <div key={shape.key} className="floating-element" style={outerStyle}>
-            <div className="floating-float" style={innerStyle}>
-              <div className="floating-spin">{svgContent}</div>
+          <div key={key} className="floating-element" style={outerStyle}>
+            <div className="floating-float" style={innerDelayStyle}>
+              <div className="floating-spin">{content}</div>
             </div>
           </div>
         );
@@ -140,11 +127,13 @@ const FloatingShapes = () => {
         .floating-element {
           position: absolute;
         }
+        /* Float animation */
         .floating-float {
           width: 100%;
           height: 100%;
           animation: float 6s ease-in-out infinite;
         }
+        /* Spin animation */
         .floating-spin {
           width: 100%;
           height: 100%;
@@ -173,18 +162,23 @@ const FloatingShapes = () => {
           width: 100%;
           height: 100%;
         }
+        /* Blob styling */
         .floating-shape.blob {
           color: rgba(79, 70, 229, 0.3);
         }
+        /* Hexagon styling */
         .floating-shape.hexagon {
           color: rgba(124, 58, 237, 0.3);
         }
+        /* Spiral styling */
         .floating-shape.spiral {
           stroke: rgba(79, 70, 229, 0.3);
         }
+        /* Cog styling */
         .floating-shape.cog {
           color: rgba(124, 58, 237, 0.3);
         }
+        /* Star styling */
         .floating-shape.star {
           color: rgba(79, 70, 229, 0.3);
         }
